@@ -16,7 +16,7 @@ navigator.mediaDevices.getUserMedia({
     myPeer.on('call',(call)=>{
         console.log("IM In");
         call.answer(stream);
-        const video =document.getElementById('video')
+        const video =document.createElement('video')
         call.on('stream',userVideoStream=>{
             addVideoStream(video,userVideoStream,"in");
         })
@@ -24,7 +24,8 @@ navigator.mediaDevices.getUserMedia({
     
     socket.on('user-connected',(userId)=>{
         console.log("USER CONNECTED "+userId);
-        connectToNewUser(userId,stream);
+        // connectToNewUser(userId,stream);
+        setTimeout(connectToNewUser,1000,userId,stream)
     })
     socket.on('user-disconnected',(userId)=>{
         console.log("USER DISCONNECTED "+userId);
