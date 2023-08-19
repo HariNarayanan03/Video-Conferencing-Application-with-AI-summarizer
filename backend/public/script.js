@@ -4,6 +4,7 @@ const myPeer = new Peer(undefined,{
     host:'/',
     port:'3001'
 })
+let togglemic = 1,togglevideo=1;
 const myVideo = document.createElement('video');
 myVideo.muted=true;
 const peers={}
@@ -20,6 +21,36 @@ navigator.mediaDevices.getUserMedia({
         call.on('stream',userVideoStream=>{
             addVideoStream(video,userVideoStream,"in");
         })
+        document.getElementById("mictoggle").onclick = ()=>{
+            if(togglemic){
+                stream.getAudioTracks()[0].enabled = false;
+                togglemic =0;
+                document.getElementById("mictoggle").innerText="MIC(🔇)";
+                console.log("mic off");
+            }
+            else {
+                stream.getAudioTracks()[0].enabled = true;
+                togglemic =1;
+                document.getElementById("mictoggle").innerText="MIC(🎙️)";
+                console.log("mic on");
+        
+            }
+        }
+        document.getElementById("videotoggle").onclick = ()=>{
+            if(togglevideo){
+                stream.getVideoTracks()[0].enabled = false;
+                togglevideo =0;
+                document.getElementById("videotoggle").innerText="VIDEO👇🏻(off)";
+                console.log("video off");
+            }
+            else {
+                stream.getVideoTracks()[0].enabled = true;
+                togglevideo =1;
+                document.getElementById("videotoggle").innerText="VIDEO👇🏻(off)";
+                console.log("video on");
+        
+            }
+        }
     })
     
     socket.on('user-connected',(userId)=>{
@@ -54,6 +85,37 @@ function connectToNewUser(userId,stream)
         console.log("ADD NEW VIDEO");
         addVideoStream(video, userVideoStream ,"new");
     })
+
+    document.getElementById("mictoggle").onclick = ()=>{
+        if(togglemic){
+            stream.getAudioTracks()[0].enabled = false;
+            togglemic =0;
+            document.getElementById("mictoggle").innerText="MIC(🔇)";
+            console.log("mic off");
+        }
+        else {
+            stream.getAudioTracks()[0].enabled = true;
+            togglemic =1;
+            document.getElementById("mictoggle").innerText="MIC(🎙️)";
+            console.log("mic on");
+    
+        }
+    }
+    document.getElementById("videotoggle").onclick = ()=>{
+        if(togglevideo){
+            stream.getVideoTracks()[0].enabled = false;
+            togglevideo =0;
+            document.getElementById("videotoggle").innerText="VIDEO👇🏻(off)";
+            console.log("video off");
+        }
+        else {
+            stream.getVideoTracks()[0].enabled = true;
+            togglevideo =1;
+            document.getElementById("videotoggle").innerText="VIDEO👇🏻(on)";
+            console.log("video on");
+    
+        }
+    }
     call.on('close',()=>{
         video.remove();
     })
