@@ -26,6 +26,13 @@ io.on('connection',(socket)=>{
         })
         // .broadcast.emit('user-connected', userId);
     })
+    socket.on('audioStream', (obj) => {
+        //obj is JSON object structured like this: {"audio_data": base64 string....}
+       
+        //verified here that stream is being received continuously
+        console.log("OBJECT"+obj);
+        
+    })
 })
 server.listen(3000,()=>{
     console.log("Server Started");
