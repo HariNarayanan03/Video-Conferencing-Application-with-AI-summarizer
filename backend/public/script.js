@@ -6,6 +6,7 @@ const myPeer = new Peer(undefined,{
     port:'3001'
 })
 let togglemic = 1,togglevideo=1;
+let text = "";
 const myVideo = document.createElement('video');
 myVideo.muted=true;
 const peers={}
@@ -26,17 +27,56 @@ navigator.mediaDevices.getUserMedia({
             addVideoStream(video,userVideoStream,"in");
         })
         document.getElementById("mictoggle").onclick = ()=>{
+            let recognition;
+            let output= "";
             if(togglemic){
                 stream.getAudioTracks()[0].enabled = false;
                 togglemic =0;
                 document.getElementById("mictoggle").innerText="MIC(🔇)";
                 console.log("mic off");
+                if (recognition) {
+                    recognition?.stop();
+                    console.log('Recording stopped...');
+                }
             }
             else {
                 stream.getAudioTracks()[0].enabled = true;
-                togglemic =1;
                 document.getElementById("mictoggle").innerText="MIC(🎙️)";
                 console.log("mic on");
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.onstart = () => {
+                    console.log('Recording started...');
+                };
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            // outputDiv.innerHTML += `<p>${transcript}</p>`;
+                            console.log("transcript->",transcript);
+                            //speech from other user
+                            text+= "\n"+transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    if(interimTranscript!="") output= interimTranscript;
+                    // console.log('Interim transcript:', interimTranscript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+
+                recognition.onend = () => {
+                    console.log('Recording ended...');
+                };
+
+                recognition.start();
+                togglemic =1;
         
             }
         }
@@ -94,18 +134,57 @@ function connectToNewUser(userId,stream)
     })
     console.log("MIC ",stream.getAudioTracks()[0]);
     document.getElementById("mictoggle").onclick = ()=>{
+        let recognition;
+        let output= "";
         if(togglemic){
             stream.getAudioTracks()[0].enabled = false;
             togglemic =0;
             document.getElementById("mictoggle").innerText="MIC(🔇)";
             console.log("mic off");
+           // if (recognition) {
+                recognition?.stop();
+                console.log('Recording stopped...');
+            //}
+           // else  console.log('Recording not stopped...',recognition); 
         }
         else {
             stream.getAudioTracks()[0].enabled = true;
-            togglemic =1;
             document.getElementById("mictoggle").innerText="MIC(🎙️)";
             console.log("mic on");
-    
+            recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.onstart = () => {
+                    console.log('Recording started...');
+                };
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            // outputDiv.innerHTML += `<p>${transcript}</p>`;
+                            console.log("transcript ",transcript);
+                            //speech from current user
+                            text+= "\n"+transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    if(interimTranscript!="") output= interimTranscript;
+                    // console.log('Interim transcript:', interimTranscript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+
+                recognition.onend = () => {
+                    console.log('Recording ended...');
+                };
+
+                recognition.start();
+                togglemic =1;
         }
     }
     document.getElementById("videotoggle").onclick = ()=>{
@@ -138,4 +217,11 @@ function addVideoStream(video,stream,stat){
         video.play();
     })
     videoGrid.append(video);
+}
+
+document.getElementById("recording").onclick = ()=>{
+    console.log("the transcript for this user is\n",text);
+
+    //send this text to summary api
+
 }
