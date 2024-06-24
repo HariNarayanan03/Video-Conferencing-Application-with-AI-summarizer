@@ -20,7 +20,7 @@ def chk():
     return "HIIIII",200
 @app.route('/summarize',methods=['GET','POST'])
 def call():
-    print("HIII Mail")
+    # print("HIII Mail")
     form=request.form.to_dict()
     txt=form['txt']
     print(len(txt))
@@ -47,16 +47,16 @@ def call():
     return sum,200
 def bart_summarize(text, num_beams, length_penalty, max_length, min_length, no_repeat_ngram_size):
     text = text.replace('\n', '')
-    print("1")
+    # print("1")
     text_input_ids = tokenizer.batch_encode_plus([text], return_tensors='pt', max_length=1024)['input_ids'].to(
         torch_device)
-    print("2")
+    # print("2")
     summary_ids = model.generate(text_input_ids, num_beams=int(num_beams), length_penalty=float(length_penalty),
                                  max_length=int(max_length), min_length=int(min_length),
                                  no_repeat_ngram_size=int(no_repeat_ngram_size))
-    print("3")
+    # print("3")
     summary_txt = tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
-    print("4")
+    # print("4")
     return summary_txt
 
 
